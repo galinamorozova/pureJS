@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<header>
+    <h1>TreeRender</h1>
+</header>
+<body>
+<label>
+    Введите текстовое определение дерева в формате (1 (2 (4 5 6 (7) 108 (9)) 3))
+    <input type="text" id="input"/>
+</label>
+<button onclick="renderData()">Отрисовать</button>
+<p>Псевдо-графическое отображение:</p>
+<ul id="ul">
+
+</ul>
+
+</body>
+<script>
+
+    let treeArray = []
+    const createTree = (container, array) => {
+        array.forEach(i => {
+            if (typeof i === "string") {
+                const liElement = document.createElement('li');
+                liElement.textContent = i;
+                container.appendChild(liElement);
+            } else {
+                const ulElement = document.createElement('ul');
+                createTree(ulElement, i);
+                container.appendChild(ulElement);
+            }
+        })
+    }
+    const createArray = (buffArray) => {
+        let index = 0
+        let buff = [];
+        const filter = buffArray.filter(i => i === "(")
+        if (filter.length > 0) {
+            for (let i = index; i < buffArray.length; i++) {
+                if (buffArray[i] === "(") {
+                    index = i;
+                } else if (buffArray[i] === ")") {
+                    const firstPart = buffArray.slice(0, index)
+                    const secondPart = buffArray.slice(index + 1, i)
+                    const thirdPart = buffArray.slice(i + 1, buffArray.length)
+                    buff = [...firstPart]
+                    buff.push(secondPart)
+                    buff = [...buff, ...thirdPart]
+                    createArray(buff)
+                    break
+                }
+            }
+        } else {
+            treeArray = buffArray
+            return treeArray
+        }
+    }
+    const renderData = () => {
+        const input = document.getElementById('input');
+        let str = input.value.substring(1, input.value.length - 1);
+        let str2 = str.replaceAll(" ", '');
+        const arr = Array.from(str2);
+        createArray(arr)
+        const generalContainer = document.getElementById('ul');
+        createTree(generalContainer, treeArray);
+    }
+
+
+</script>
+</html>
